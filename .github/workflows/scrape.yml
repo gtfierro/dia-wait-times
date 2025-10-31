@@ -46,9 +46,16 @@ jobs:
           mkdir -p screenshots
           mkdir -p data
 
-      - name: Scrape DIA wait times
+      - name: Take screenshots
         run: |
           shot-scraper multi shots.yml
+
+      - name: Scrape wait times data as JSON
+        run: |
+          shot-scraper javascript https://www.flydenver.com/waittimesmonitorsview/ \
+            --javascript "$(cat scrape.js)" \
+            --output data/wait-times.json \
+            --wait 3000
 
       - name: Commit and push if changes
         run: |-

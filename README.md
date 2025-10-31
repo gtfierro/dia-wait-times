@@ -19,7 +19,8 @@ This scraper:
 │   └── dia-wait-times.png
 ├── data/                     # Structured JSON data
 │   └── wait-times.json
-├── shots.yml                 # shot-scraper configuration
+├── shots.yml                 # shot-scraper screenshot configuration
+├── scrape.js                 # JavaScript code for data extraction
 ├── requirements.txt          # Python dependencies
 └── README.md                 # This file
 ```
@@ -73,29 +74,35 @@ shot-scraper install
 # Create output directories
 mkdir -p screenshots data
 
-# Run the scraper
+# Take screenshots (configured in shots.yml)
 shot-scraper multi shots.yml
 
-# Or run individual commands:
-
-# Take a screenshot only
-shot-scraper https://www.flydenver.com/waittimesmonitorsview/ \
-  --output screenshots/dia-wait-times.png \
-  --width 1920 --height 1080 --wait 3000
-
-# Scrape data only
+# Scrape wait times data as JSON
 shot-scraper javascript https://www.flydenver.com/waittimesmonitorsview/ \
-  --javascript "your-javascript-here" \
-  --output data/wait-times.json
+  --javascript "$(cat scrape.js)" \
+  --output data/wait-times.json \
+  --wait 3000
+
+# Or run both with a single script
+shot-scraper multi shots.yml && \
+shot-scraper javascript https://www.flydenver.com/waittimesmonitorsview/ \
+  --javascript "$(cat scrape.js)" \
+  --output data/wait-times.json \
+  --wait 3000
 ```
 
 ## Configuration
 
-The scraping behavior is configured in `shots.yml`. You can modify:
-
+### shots.yml
+Screenshot configuration. You can modify:
 - **wait**: Time to wait before capturing (milliseconds)
 - **width/height**: Screenshot dimensions
-- **javascript**: Custom JavaScript for data extraction
+
+### scrape.js
+JavaScript code for extracting wait times data. Modify this file to:
+- Change data extraction logic
+- Add new fields to capture
+- Handle different page structures
 
 ## Automation
 
@@ -116,4 +123,4 @@ See [LICENSE](LICENSE) file for details.
 
 ## Notes
 
-The JavaScript extraction code in `shots.yml` attempts to parse the wait times page structure. If the page layout changes, the extraction logic may need to be updated to match the new structure.
+The JavaScript extraction code in `scrape.js` attempts to parse the wait times page structure using multiple strategies (tables, div-based layouts, etc.). If the page layout changes, the extraction logic may need to be updated to match the new structure.

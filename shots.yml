@@ -1,5 +1,5 @@
 # DIA Wait Times Scraper Configuration
-# Captures both visual screenshots and structured data from Denver International Airport wait times
+# Captures visual screenshots from Denver International Airport wait times page
 
 # Screenshot of the wait times page
 - url: https://www.flydenver.com/waittimesmonitorsview/
@@ -7,62 +7,3 @@
   wait: 3000
   width: 1920
   height: 1080
-
-# Scrape wait times data as JSON
-- url: https://www.flydenver.com/waittimesmonitorsview/
-  output: data/wait-times.json
-  wait: 3000
-  javascript: |
-    // Function to extract wait times from the page
-    (function extractWaitTimes() {
-      const data = {
-        timestamp: new Date().toISOString(),
-        source: 'Denver International Airport',
-        url: window.location.href,
-        checkpoints: []
-      };
-
-      // Try to find tables with wait time data
-      const tables = document.querySelectorAll('table');
-      if (tables.length > 0) {
-        tables.forEach((table, idx) => {
-          const rows = table.querySelectorAll('tr');
-          rows.forEach((row, rowIdx) => {
-            const cells = row.querySelectorAll('td, th');
-            if (cells.length >= 2) {
-              const checkpoint = {
-                location: cells[0]?.textContent?.trim() || `Row ${rowIdx}`,
-                waitTime: cells[1]?.textContent?.trim() || 'Unknown',
-                rawData: Array.from(cells).map(c => c.textContent.trim())
-              };
-              if (checkpoint.location && checkpoint.waitTime) {
-                data.checkpoints.push(checkpoint);
-              }
-            }
-          });
-        });
-      }
-
-      // Try to find div-based layouts
-      const containers = document.querySelectorAll('.wait-time, [class*="checkpoint"], [class*="wait-time"]');
-      containers.forEach(container => {
-        const location = container.querySelector('[class*="name"], [class*="location"], h2, h3, h4')?.textContent?.trim();
-        const time = container.querySelector('[class*="time"], [class*="wait"], [class*="minutes"]')?.textContent?.trim();
-
-        if (location && time) {
-          data.checkpoints.push({
-            location: location,
-            waitTime: time,
-            element: container.className
-          });
-        }
-      });
-
-      // Capture all text content if no structured data found
-      if (data.checkpoints.length === 0) {
-        data.pageText = document.body.innerText;
-        data.note = 'No structured wait time data found. Captured page text for analysis.';
-      }
-
-      return data;
-    })()
