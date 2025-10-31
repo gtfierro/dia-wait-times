@@ -3,9 +3,9 @@ name: Scrape DIA Wait Times
 on:
   push:
   workflow_dispatch:
-  schedule:
-    # Run every hour at minute 15
-    - cron: "15 * * * *"
+  # schedule:
+  #   # Run every hour at minute 15
+  #   - cron: "15 * * * *"
 
 permissions:
   contents: write
