@@ -11,33 +11,16 @@
 # Scrape wait times data as JSON
 - url: https://www.flydenver.com/waittimesmonitorsview/
   output: data/wait-times.json
+  wait: 3000
   javascript: |
-    // Wait for content to load
-    await new Promise(r => setTimeout(r, 2000));
-
     // Function to extract wait times from the page
-    function extractWaitTimes() {
+    (function extractWaitTimes() {
       const data = {
         timestamp: new Date().toISOString(),
         source: 'Denver International Airport',
         url: window.location.href,
         checkpoints: []
       };
-
-      // Try multiple selectors to find wait time information
-      // This will need to be adjusted based on the actual page structure
-
-      // Common patterns for wait time displays
-      const selectors = [
-        '.wait-time',
-        '[class*="wait"]',
-        '[class*="checkpoint"]',
-        '[data-wait-time]',
-        '.security-checkpoint',
-        '.tsa-wait',
-        'table tr',
-        '.monitor-view'
-      ];
 
       // Try to find tables with wait time data
       const tables = document.querySelectorAll('table');
@@ -82,6 +65,4 @@
       }
 
       return data;
-    }
-
-    return extractWaitTimes();
+    })()
