@@ -1,0 +1,9 @@
+# DIA Wait Times Scraper Configuration
+# Captures visual screenshots from Denver International Airport wait times page
+
+# Screenshot of the wait times page
+- url: https://www.flydenver.com/waittimesmonitorsview/
+  output: screenshots/dia-wait-times.png
+  wait: 3000
+  width: 1920
+  height: 1080
